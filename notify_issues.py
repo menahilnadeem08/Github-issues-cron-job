@@ -12,7 +12,7 @@ headers = {
 }
 
 # Only get issues created in the last 10 minutes
-since = datetime.now(timezone.utc) - timedelta(minutes=10)
+since = datetime.now(timezone.utc) - timedelta(minutes=60)
 since_str = since.strftime('%Y-%m-%dT%H:%M:%SZ')
 
 url = f"https://api.github.com/repos/{REPO}/issues?state=open&sort=created&direction=asc&per_page=50&since={since_str}"
