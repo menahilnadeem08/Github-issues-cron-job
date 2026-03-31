@@ -18,7 +18,7 @@ if os.path.exists(LAST_RUN_FILE):
         since_str = f.read().strip()
     since = datetime.strptime(since_str, '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)
 else:
-    since = datetime.now(timezone.utc) - timedelta(minutes=60)
+    since = datetime.now(timezone.utc) - timedelta(minutes=15)
     since_str = since.strftime('%Y-%m-%dT%H:%M:%SZ')
 
 # Save current time as next run's "since"
