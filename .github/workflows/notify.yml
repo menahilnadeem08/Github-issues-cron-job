@@ -2,7 +2,7 @@ name: Notify Google Chat on New Issues
 
 on:
   schedule:
-    - cron: '*/6 * * * *'
+    - cron: '*/15 * * * *'
   workflow_dispatch:
 
 jobs:
