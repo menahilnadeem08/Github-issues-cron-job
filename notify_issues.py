@@ -3,7 +3,7 @@ import requests
 from datetime import datetime, timezone, timedelta
 
 GITHUB_TOKEN = os.environ['GITHUB_TOKEN']
-REPO = os.environ['GITHUB_REPOSITORY']
+REPO ="Expensify/App"
 WEBHOOK_URL = os.environ['GOOGLE_CHAT_WEBHOOK']
 
 headers = {
@@ -20,8 +20,8 @@ response = requests.get(url, headers=headers)
 response.raise_for_status()
 issues = response.json()
 
+print(f"Monitoring repo: {REPO}")
 print(f"Found {len(issues)} issues since {since_str}")
-
 for issue in issues:
     if 'pull_request' in issue:
         continue  # skip pull requests
