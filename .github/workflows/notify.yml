@@ -1,41 +1,41 @@
-name: Notify Google Chat on New Issues
+# name: Notify Google Chat on New Issues
 
-on:
-  schedule:
-    - cron: '*/15 * * * *'
-  workflow_dispatch:
+# on:
+#   schedule:
+#     - cron: '*/15 * * * *'
+#   workflow_dispatch:
 
-jobs:
-  notify:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+# jobs:
+#   notify:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout repo
+#         uses: actions/checkout@v4
 
-      - name: Restore last run time from cache
-        uses: actions/cache/restore@v4
-        with:
-          path: last_run.txt
-          key: last-run-${{ github.run_id }}
-          restore-keys: |
-            last-run-
+#       - name: Restore last run time from cache
+#         uses: actions/cache/restore@v4
+#         with:
+#           path: last_run.txt
+#           key: last-run-${{ github.run_id }}
+#           restore-keys: |
+#             last-run-
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.x'
 
-      - name: Install dependencies
-        run: pip install requests
+#       - name: Install dependencies
+#         run: pip install requests
 
-      - name: Run notification script
-        run: python notify_issues.py
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GOOGLE_CHAT_WEBHOOK: ${{ secrets.GOOGLE_CHAT_WEBHOOK }}
+#       - name: Run notification script
+#         run: python notify_issues.py
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#           GOOGLE_CHAT_WEBHOOK: ${{ secrets.GOOGLE_CHAT_WEBHOOK }}
 
-      - name: Save last run time to cache
-        uses: actions/cache/save@v4
-        with:
-          path: last_run.txt
-          key: last-run-${{ github.run_id }}
+#       - name: Save last run time to cache
+#         uses: actions/cache/save@v4
+#         with:
+#           path: last_run.txt
+#           key: last-run-${{ github.run_id }}
