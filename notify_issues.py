@@ -4,33 +4,39 @@ import requests
 GITHUB_TOKEN = os.environ['GITHUB_TOKEN']
 REPO = os.environ['GITHUB_REPOSITORY']
 WEBHOOK_URL = os.environ['GOOGLE_CHAT_WEBHOOK']
-LAST_ISSUE_FILE = "last_issue_id.txt"
+# Passed in from the workflow as an env var (stored as a secret or cache artifact)
+LAST_ISSUE_ID = int(os.environ.get('LAST_ISSUE_ID', '0'))
 
-headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+headers = {
+    "Authorization": f"token {GITHUB_TOKEN}",
+    "Accept": "application/vnd.github+json"
+}
 
-# Load last processed issue ID
-if os.path.exists(LAST_ISSUE_FILE):
-    with open(LAST_ISSUE_FILE, "r") as f:
-        last_issue_id = int(f.read().strip())
-else:
-    last_issue_id = 0
-
-# Fetch issues
-url = f"https://api.github.com/repos/{REPO}/issues?state=open&sort=created&direction=asc"
+url = f"https://api.github.com/repos/{REPO}/issues?state=open&sort=created&direction=asc&per_page=50"
 response = requests.get(url, headers=headers)
+response.raise_for_status()
 issues = response.json()
 
-new_last_id = last_issue_id
+new_last_id = LAST_ISSUE_ID
 
 for issue in issues:
-    if issue['id'] > last_issue_id and 'pull_request' not in issue:
-        # Send to Google Chat
-        data = {
-            "text": f"**New GitHub Issue**\nTitle: {issue['title']}\nURL: {issue['html_url']}\nCreated by: {issue['user']['login']}"
+    if issue['id'] > LAST_ISSUE_ID and 'pull_request' not in issue:
+        message = {
+            "cards": [{
+                "header": {"title": "New GitHub Issue", "subtitle": REPO},
+                "sections": [{
+                    "widgets": [
+                        {"keyValue": {"topLabel": "Title", "content": issue['title']}},
+                        {"keyValue": {"topLabel": "Opened by", "content": issue['user']['login']}},
+                        {"buttons": [{"textButton": {"text": "View Issue", "onClick": {"openLink": {"url": issue['html_url']}}}}]}
+                    ]
+                }]
+            }]
         }
-        requests.post(WEBHOOK_URL, json=data)
+        resp = requests.post(WEBHOOK_URL, json=message)
+        resp.raise_for_status()
         new_last_id = max(new_last_id, issue['id'])
 
-# Update last processed ID
-with open(LAST_ISSUE_FILE, "w") as f:
+# Write new ID to file so the workflow can cache it
+with open("last_issue_id.txt", "w") as f:
     f.write(str(new_last_id))
