@@ -1,0 +1,29 @@
+name: Notify Google Chat on new issues
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'  # runs every 5 minutes
+  workflow_dispatch:
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run notification script
+        run: python notify_issues.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GOOGLE_CHAT_WEBHOOK: ${{ secrets.GOOGLE_CHAT_WEBHOOK }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
