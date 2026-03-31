@@ -8,26 +8,9 @@ on:
 jobs:
   notify:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
-
-      - name: Restore last issue ID from cache
-        id: cache-issue-id
-        uses: actions/cache@v3
-        with:
-          path: last_issue_id.txt
-          key: last-issue-id
-
-      - name: Read last issue ID
-        id: read-id
-        run: |
-          if [ -f last_issue_id.txt ]; then
-            echo "LAST_ISSUE_ID=$(cat last_issue_id.txt)" >> $GITHUB_ENV
-          else
-            echo "LAST_ISSUE_ID=0" >> $GITHUB_ENV
-          fi
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -43,10 +26,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GOOGLE_CHAT_WEBHOOK: ${{ secrets.GOOGLE_CHAT_WEBHOOK }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          LAST_ISSUE_ID: ${{ env.LAST_ISSUE_ID }}
-
-      - name: Save last issue ID to cache
-        uses: actions/cache@v3
-        with:
-          path: last_issue_id.txt
-          key: last-issue-id
