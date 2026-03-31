@@ -11,7 +11,7 @@ headers = {
     "Accept": "application/vnd.github+json"
 }
 
-since = datetime.now(timezone.utc) - timedelta(minutes=60)
+since = datetime.now(timezone.utc) - timedelta(minutes=5)
 since_str = since.strftime('%Y-%m-%dT%H:%M:%SZ')
 
 # Remove &since= from URL, sort by created desc to get newest first
