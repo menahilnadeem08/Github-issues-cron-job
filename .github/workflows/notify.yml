@@ -10,10 +10,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Restore last run time from cache
+        uses: actions/cache/restore@v4
+        with:
+          path: last_run.txt
+          key: last-run-${{ github.run_id }}
+          restore-keys: |
+            last-run-
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
@@ -25,4 +33,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GOOGLE_CHAT_WEBHOOK: ${{ secrets.GOOGLE_CHAT_WEBHOOK }}
-          GITHUB_REPOSITORY: "Expensify/App"    
+
+      - name: Save last run time to cache
+        uses: actions/cache/save@v4
+        with:
+          path: last_run.txt
+          key: last-run-${{ github.run_id }}
+```
+
+**How this works:**
+```
+Run 1 (5:00 PM) → no last_run.txt → looks back 60 mins → saves 5:00 PM
+Run 2 (5:37 PM) → reads 5:00 PM → only fetches 5:00-5:37 → saves 5:37 PM  
+Run 3 (5:42 PM) → reads 5:37 PM → only fetches 5:37-5:42 → saves 5:42 PM
